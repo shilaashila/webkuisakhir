@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Kuis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('bunga.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            text-align: center;
+            padding: 50px;
+            color: rgb(255, 255, 255);
+        }
+
+        button {
+            background-color: #008CBA;
+            color: rgb(102, 0, 255);
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005f6b;
+        }
+
+        .quiz-container {
+            background-color: rgba(0, 255, 17, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            width: 60%;
+            text-align: center;
+        }
+
+        #quiz {
+            display: none;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            margin: 10px 0;
+        }
+
+        .answers ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .answers li {
+            margin: 10px 0;
+        }
+
+        #timer {
+            font-size: 18px;
+            color: #ff0000;
+        }
+
+        .correct {
+            background-color: #28a745 !important;
+        }
+
+        .incorrect {
+            background-color: #dc3545 !important;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kuis Pengetahuan Umum</h1>
+
+    <div class="quiz-container">
+        <h3>Pilih Mata Pelajaran:</h3>
+        <select id="subject">
+            <option value="umum">Pengetahuan Umum</option>
+            <option value="sains">Sains</option>
+            <option value="geografi">Geografi</option>
+        </select>
+        <br><br>
+        <h3>Pilih Tingkat Kesulitan:</h3>
+        <select id="difficulty">
+            <option value="sedang">Sedang</option>
+            <option value="sulit">Sulit</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="startQuiz()">Mulai Kuis</button>
+    </div>
+
+    <div id="quiz" class="quiz-container">
+        <div id="timer"></div>
+        <div id="question" class="question"></div>
+        <div class="answers">
+            <ul id="answer-list"></ul>
+        </div>
+        <br>
+        <button onclick="nextQuestion()">Next</button>
+    </div>
+
+    <script>
+        const questions = {
+            umum: {
+                sedang: [
+                    {
+                        question: "Apa ibu kota Indonesia?",
+                        answers: {
+                            a: "Bandung",
+                            b: "Jakarta",
+                            c: "Surabaya",
+                            d: "Medan"
+                        },
+                        correctAnswer: "b"
+                    },
+                    {
+                        question: "Siapa penulis novel 'Harry Potter'?",
+                        answers: {
+                            a: "J.K. Rowling",
+                            b: "J.R.R. Tolkien",
+                            c: "George R.R. Martin",
+                            d: "Agatha Christie"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Makan menggunakan?",
+                        answers: {
+                            a: "Tangan",
+                            b: "Sendok",
+                            c: "Mulut",
+                            d: "Piring"
+                        },
+                        correctAnswer: "c"
+                    }
+                ],
+                sulit: [
+                    {
+                        question: "Apa nama ibu kota Indonesia sebelum Jakarta?",
+                        answers: {
+                            a: "Semarang",
+                            b: "Medan",
+                            c: "Bandung",
+                            d: "Yogyakarta"
+                        },
+                        correctAnswer: "b"
+                    },
+                    {
+                        question: "Siapa penulis novel 'Lord of the Rings'?",
+                        answers: {
+                            a: "J.R.R. Tolkien",
+                            b: "George R.R. Martin",
+                            c: "J.K. Rowling",
+                            d: "Agatha Christie"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Negara manakah yang pertama kali memberikan hak suara kepada perempuan pada tahun 1893?",
+                        answers: {
+                            a: "Amerika Serikat",
+                            b: "Inggris",
+                            c: "Selandia Baru",
+                            d: "Kanada"
+                        },
+                        correctAnswer: "c"
+                    }
+                ]
+            },
+            sains: {
+                sedang: [
+                    {
+                        question: "Siapa penemu listrik?",
+                        answers: {
+                            a: "Nikola Tesla",
+                            b: "Albert Einstein",
+                            c: "Thomas Edison",
+                            d: "Galileo Galilei"
+                        },
+                        correctAnswer: "c"
+                    },
+                    {
+                        question: "Apa sumber energi utama bagi kehidupan di bumi?",
+                        answers: {
+                            a: "Matahari",
+                            b: "Air",
+                            c: "Bulan",
+                            d: "Angin"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Mengapa langit berwarna biru pada siang hari?",
+                        answers: {
+                            a: "Karena atmosfer memantulkan warna biru lebih banyak",
+                            b: "Karena sinar matahari berwarna biru",
+                            c: "Karena awan memantulkan warna biru",
+                            d: "Karena air laut memantulkan cahaya ke langit"
+                        },
+                        correctAnswer: "a"
+                    }
+                ],
+                sulit: [
+                    {
+                        question: "Siapa yang menemukan teori relativitas?",
+                        answers: {
+                            a: "Nikola Tesla",
+                            b: "Albert Einstein",
+                            c: "Isaac Newton",
+                            d: "Galileo Galilei"
+                        },
+                        correctAnswer: "b"
+                    },
+                    {
+                        question: "Berapa tahun cahaya yang dibutuhkan cahaya matahari untuk sampai ke Bumi?",
+                        answers: {
+                            a: "8 menit",
+                            b: "12 menit",
+                            c: "20 menit",
+                            d: "24 menit"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Sebutkan nama partikel subatomik yang tidak memiliki muatan listrik?",
+                        answers: {
+                            a: "Proton",
+                            b: "Elektron",
+                            c: "Neutron",
+                            d: "Positron"
+                        },
+                        correctAnswer: "c"
+                    }
+                ]
+            },
+            geografi: {
+                sedang: [
+                    {
+                        question: "Apa ibu kota negara Jepang?",
+                        answers: {
+                            a: "Seoul",
+                            b: "Tokyo",
+                            c: "Beijing",
+                            d: "Bangkok"
+                        },
+                        correctAnswer: "b"
+                    },
+                    {
+                        question: "Gunung tertinggi di dunia adalah?",
+                        answers: {
+                            a: "K2",
+                            b: "Everest",
+                            c: "Kilimanjaro",
+                            d: "Aconcagua"
+                        },
+                        correctAnswer: "b"
+                    },
+                    {
+                        question: "Sungai terpanjang di dunia adalah?",
+                        answers: {
+                            a: "Amazon",
+                            b: "Nil",
+                            c: "Yangtze",
+                            d: "Mekong"
+                        },
+                        correctAnswer: "a"
+                    }
+                ],
+                sulit: [
+                    {
+                        question: "Di negara manakah terdapat Danau Baikal?",
+                        answers: {
+                            a: "Rusia",
+                            b: "Kanada",
+                            c: "Brasil",
+                            d: "China"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Apa nama gurun terbesar di dunia?",
+                        answers: {
+                            a: "Gurun Sahara",
+                            b: "Gurun Atacama",
+                            c: "Gurun Gobi",
+                            d: "Gurun Kalahari"
+                        },
+                        correctAnswer: "a"
+                    },
+                    {
+                        question: "Di negara manakah letak Taman Nasional Yellowstone?",
+                        answers: {
+                            a: "Amerika Serikat",
+                            b: "Kanada",
+                            c: "Australia",
+                            d: "Afrika Selatan"
+                        },
+                        correctAnswer: "a"
+                    }
+                ]
+            }
+        };
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeRemaining = 120;
+        let timer;
+        let selectedSubject;
+        let selectedDifficulty;
+
+        function startQuiz() {
+            selectedSubject = document.getElementById('subject').value;
+            selectedDifficulty = document.getElementById('difficulty').value;
+            alert(`Mata pelajaran: ${selectedSubject}\nTingkat kesulitan: ${selectedDifficulty}\nKuis dimulai!`);
+            document.querySelector('.quiz-container').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            currentQuestionIndex = 0;
+            score = 0;
+            timeRemaining = 120;
+            startTimer();
+            showQuestion();
+        }
+
+        function startTimer() {
+            timer = setInterval(function() {
+                timeRemaining--;
+                document.getElementById('timer').textContent = `Waktu tersisa: ${timeRemaining}s`;
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    alert(`Waktu habis! Skor akhir Anda: ${score}`);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            let currentQuestion = questions[selectedSubject][selectedDifficulty][currentQuestionIndex];
+            document.getElementById('question').innerHTML = `<ul><li>${currentQuestion.question}</li></ul>`;
+            
+            let answerList = document.getElementById('answer-list');
+            answerList.innerHTML = '';
+            
+            for (let key in currentQuestion.answers) {
+                let listItem = document.createElement('li');
+                let button = document.createElement('button');
+                button.textContent = `${key.toUpperCase()}. ${currentQuestion.answers[key]}`;
+                button.onclick = () => checkAnswer(key, button);
+                listItem.appendChild(button);
+                answerList.appendChild(listItem);
+            }
+        }
+
+        function checkAnswer(selectedAnswer, button) {
+            let correctAnswer = questions[selectedSubject][selectedDifficulty][currentQuestionIndex].correctAnswer;
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+            }
+            let allButtons = document.querySelectorAll('.answers button');
+            allButtons.forEach(btn => btn.disabled = true);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions[selectedSubject][selectedDifficulty].length) {
+                showQuestion();
+            } else {
+                alert(`Kuis selesai! Skor Anda: ${score}`);
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            document.getElementById('quiz').style.display = 'none';
+            document.querySelector('.quiz-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
